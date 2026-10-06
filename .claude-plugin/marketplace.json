@@ -1,0 +1,17 @@
+{
+  "name": "tacit",
+  "description": "Tacit — learn while you delegate to AI coding agents.",
+  "owner": {
+    "name": "He4rt Developers",
+    "url": "https://github.com/he4rt"
+  },
+  "plugins": [
+    {
+      "name": "tacit",
+      "source": "./",
+      "description": "Learn while you delegate: guided, file-by-file walkthroughs of AI-written code with concept explanations, diagrams and comprehension checks.",
+      "version": "0.1.0",
+      "category": "learning"
+    }
+  ]
+}

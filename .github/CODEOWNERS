@@ -1,0 +1,8 @@
+# Default reviewer for everything
+* @DiogoKaster @he4rt/tacit-admin
+
+# Anything that executes code or changes how every session behaves needs careful review
+/skills/ @DiogoKaster @he4rt/tacit-admin
+/references/ @DiogoKaster @he4rt/tacit-admin
+/scripts/ @DiogoKaster @he4rt/tacit-admin
+/.github/ @DiogoKaster @he4rt/tacit-admin

@@ -1,0 +1,146 @@
+#!/usr/bin/env node
+// Validates the plugin (manifests, skills, concept catalog) and generates concepts/INDEX.md.
+//   node scripts/check.mjs          validate + regenerate the index
+//   node scripts/check.mjs --check  validate + fail if the index is out of date (CI)
+import { readFileSync, writeFileSync, readdirSync, existsSync, statSync } from "node:fs";
+import { join, relative, sep } from "node:path";
+
+const ROOT = new URL("..", import.meta.url).pathname;
+const CHECK = process.argv.includes("--check");
+const LEVELS = ["basic", "intermediate", "advanced"];
+const BASE_TRACKS = ["data", "backend", "integrations", "quality"];
+const errors = [];
+
+const read = (p) => readFileSync(join(ROOT, p), "utf8");
+const readJson = (p) => JSON.parse(read(p));
+
+// Minimal YAML frontmatter parser: scalars, inline arrays and block lists. No dependencies.
+function frontmatter(text, file) {
+  const match = text.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) {
+    errors.push(`${file}: missing frontmatter`);
+    return {};
+  }
+  const data = {};
+  let listKey = null;
+  for (const raw of match[1].split("\n")) {
+    if (!raw.trim()) continue;
+    const item = raw.match(/^\s+-\s+(.*)$/);
+    if (item && listKey) {
+      data[listKey].push(scalar(item[1]));
+      continue;
+    }
+    const kv = raw.match(/^([\w-]+):\s*(.*)$/);
+    if (!kv) continue;
+    const [, key, value] = kv;
+    const clean = stripComment(value);
+    if (clean === "") {
+      data[key] = [];
+      listKey = key;
+    } else if (clean.startsWith("[")) {
+      data[key] = clean.slice(1, -1).split(",").map((s) => scalar(s)).filter(Boolean);
+      listKey = null;
+    } else {
+      data[key] = scalar(clean);
+      listKey = null;
+    }
+  }
+  return data;
+}
+
+function stripComment(value) {
+  const v = value.trim();
+  if (v.startsWith('"') || v.startsWith("'")) return v;
+  const i = v.search(/\s#/);
+  return (i === -1 ? v : v.slice(0, i)).trim();
+}
+
+function scalar(value) {
+  const v = stripComment(value);
+  if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) return v.slice(1, -1);
+  if (v === "true") return true;
+  if (v === "false") return false;
+  return v;
+}
+
+function walk(dir) {
+  return readdirSync(join(ROOT, dir)).flatMap((name) => {
+    const p = join(dir, name);
+    return statSync(join(ROOT, p)).isDirectory() ? walk(p) : [p];
+  });
+}
+
+// --- Manifests -------------------------------------------------------------
+const plugin = readJson(".claude-plugin/plugin.json");
+const marketplace = readJson(".claude-plugin/marketplace.json");
+for (const field of ["name", "version", "description"]) {
+  if (!plugin[field]) errors.push(`plugin.json: missing "${field}"`);
+}
+const entry = marketplace.plugins?.find((p) => p.name === plugin.name);
+if (!entry) errors.push(`marketplace.json: no entry for plugin "${plugin.name}"`);
+else if (entry.version !== plugin.version) {
+  errors.push(`marketplace.json version (${entry.version}) differs from plugin.json (${plugin.version})`);
+}
+
+// --- Skills ----------------------------------------------------------------
+for (const name of readdirSync(join(ROOT, "skills"))) {
+  const file = `skills/${name}/SKILL.md`;
+  if (!existsSync(join(ROOT, file))) {
+    errors.push(`${file}: missing`);
+    continue;
+  }
+  const fm = frontmatter(read(file), file);
+  if (fm.name !== name) errors.push(`${file}: name "${fm.name}" must match directory "${name}"`);
+  if (!fm.description) errors.push(`${file}: missing description`);
+}
+
+// --- Concepts --------------------------------------------------------------
+const concepts = walk("concepts")
+  .filter((p) => p.endsWith(".md") && !p.endsWith("INDEX.md") && !p.includes("_TEMPLATE"))
+  .map((p) => {
+    const fm = frontmatter(read(p), p);
+    const expectedId = relative("concepts", p).replace(/\.md$/, "").split(sep).join("/");
+    if (fm.id !== expectedId) errors.push(`${p}: id "${fm.id}" must be "${expectedId}"`);
+    if (!fm.title) errors.push(`${p}: missing title`);
+    if (!LEVELS.includes(fm.level)) errors.push(`${p}: level must be one of ${LEVELS.join(", ")}`);
+    if (fm.track !== expectedId.split("/")[0]) errors.push(`${p}: track "${fm.track}" must match its folder`);
+    if (!Array.isArray(fm.signals) || fm.signals.length === 0) errors.push(`${p}: add at least one signal`);
+    return { ...fm, prerequisites: fm.prerequisites ?? [] };
+  });
+
+const ids = new Set(concepts.map((c) => c.id));
+for (const c of concepts) {
+  for (const pre of c.prerequisites) {
+    if (!ids.has(pre)) errors.push(`concepts/${c.id}.md: unknown prerequisite "${pre}"`);
+  }
+}
+
+// --- Index -----------------------------------------------------------------
+const tracks = [...new Set(concepts.map((c) => c.track))].sort(
+  (a, b) => (BASE_TRACKS.indexOf(a) + 1 || 99) - (BASE_TRACKS.indexOf(b) + 1 || 99) || a.localeCompare(b),
+);
+let index = `# Concept catalog\n\n<!-- Generated by scripts/check.mjs — do not edit by hand. -->\n\n`;
+index += `${concepts.length} concepts. Each file has an explanation, an analogy, common mistakes and suggested questions.\n`;
+for (const track of tracks) {
+  index += `\n## ${track}\n\n| Id | Title | Level | Prerequisites | Signals |\n|---|---|---|---|---|\n`;
+  const rows = concepts
+    .filter((c) => c.track === track)
+    .sort((a, b) => LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level) || a.id.localeCompare(b.id));
+  for (const c of rows) {
+    const signals = (c.signals ?? []).join("; ").replaceAll("|", "\\|");
+    index += `| [${c.id}](${c.id}.md) | ${c.title} | ${c.level} | ${c.prerequisites.join(", ") || "—"} | ${signals} |\n`;
+  }
+}
+
+const indexPath = join(ROOT, "concepts/INDEX.md");
+const current = existsSync(indexPath) ? readFileSync(indexPath, "utf8") : "";
+if (current !== index) {
+  if (CHECK) errors.push("concepts/INDEX.md is out of date — run `node scripts/check.mjs`");
+  else writeFileSync(indexPath, index);
+}
+
+if (errors.length) {
+  console.error(`✗ ${errors.length} problem(s):\n` + errors.map((e) => `  - ${e}`).join("\n"));
+  process.exit(1);
+}
+console.log(`✓ plugin ${plugin.name}@${plugin.version}, ${readdirSync(join(ROOT, "skills")).length} skills, ${concepts.length} concepts`);

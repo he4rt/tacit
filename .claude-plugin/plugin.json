@@ -1,0 +1,13 @@
+{
+  "name": "tacit",
+  "version": "0.1.0",
+  "description": "Learn while you delegate. Tacit walks you through the code your AI agent writes, file by file, teaching the concepts behind it and checking that you actually understood.",
+  "author": {
+    "name": "Diogo Kaster",
+    "url": "https://github.com/DiogoKaster"
+  },
+  "homepage": "https://github.com/he4rt/tacit",
+  "repository": "https://github.com/he4rt/tacit",
+  "license": "MIT",
+  "keywords": ["learning", "education", "code-review", "walkthrough", "architecture", "mentoring"]
+}

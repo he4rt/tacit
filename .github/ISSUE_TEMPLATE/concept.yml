@@ -1,0 +1,38 @@
+name: Concept proposal
+description: Suggest a concept Tacit should teach
+labels: [concept]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Concept
+      placeholder: e.g. Database indexes
+    validations:
+      required: true
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      options: [data, backend, integrations, quality, language-specific, other]
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      options: [basic, intermediate, advanced]
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Where does it show up in AI-written code?
+      description: The code patterns that signal this concept, and why learners struggle with it.
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to write this concept myself
