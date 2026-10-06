@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "scripts": {
+    "validate": "npm run validate:plugin && npm run validate:manifest && npm run validate:skills",
+    "validate:plugin": "claude plugin validate .",
+    "validate:manifest": "claude plugin validate .claude-plugin/plugin.json",
+    "validate:skills": "claude plugin validate skills"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-code": "2.1.292"
+  },
+  "allowScripts": {
+    "@anthropic-ai/claude-code@2.1.292": true
+  }
+}
