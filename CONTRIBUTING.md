@@ -34,7 +34,7 @@ Skills live in `skills/<name>/SKILL.md`. Keep them **agent-agnostic**: don't ref
 
 ```bash
 node scripts/check.mjs           # validate + regenerate the index
-claude plugin validate .         # validate manifests (Claude Code)
+npm ci && npm run validate       # validate manifests and skills (Claude Code)
 claude --plugin-dir .            # run Claude Code with your local copy of the plugin
 ```
 
