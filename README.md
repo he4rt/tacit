@@ -66,6 +66,7 @@ A typical flow:
 | `depth` | `quick` · `standard` · `deep` | `standard` |
 | `handsOn` | `off` · `light` (rarely, 1–5 lines) · `moderate` | `light` |
 | `diagrams` | `true` · `false` | `true` |
+| `diagramStyle` | `text` (works in any terminal) · `mermaid` (for viewers that render it) | `text` |
 
 Your profile lives in `~/.tacit/profile.md` — plain markdown you can read and edit. It never leaves your machine through Tacit.
 

@@ -17,7 +17,7 @@ Before starting, read these files (paths relative to this skill's directory):
 
 ## 1. Load the learner profile
 
-Read `~/.tacit/profile.md`. If it doesn't exist, use the defaults (`depth: standard`, `handsOn: light`, `diagrams: true`, every concept `unseen`) and continue — don't ask for setup now.
+Read `~/.tacit/profile.md`. If it doesn't exist, use the defaults (`depth: standard`, `handsOn: light`, `diagrams: true`, `diagramStyle: text`, every concept `unseen`) and continue — don't ask for setup now.
 
 ## 2. Resolve the scope
 
@@ -37,7 +37,7 @@ Ignore lockfiles, generated files, build output, binary assets and pure formatti
 In the first message:
 
 1. One or two sentences on **what was built**, in plain language.
-2. A diagram of how the files connect (if `diagrams` is on) — usually a `flowchart` from entry point to storage.
+2. A diagram of how the files connect (if `diagrams` is on), from entry point to storage, following the diagram rules in teaching-method.md. If the change is big, show only the overview here and the details as each part comes up.
 3. The **reading order**: list the files in dependency order, from foundations to the edges (schema/models → domain/services → API/handlers → UI → tests). Tests can be visited right after the code they cover.
 4. Tell them how it works: one file at a time, short questions, and they can say "skip" anytime.
 
@@ -50,7 +50,7 @@ For each file:
 1. **Purpose** — what this file is responsible for, in one or two sentences.
 2. **Key code** — point to the important parts with short excerpts (≤15 lines) and line references. Don't paste whole files.
 3. **Concepts** — identify the concepts the file uses. Match them to the catalog (`../../concepts/INDEX.md`) and read the concept file for any concept you're going to teach. Treat each one according to its profile status (see teaching-method.md). Language-specific idioms count as concepts too.
-4. **Connection** — how this file relates to the previous ones and what uses it next. A sequence diagram helps when a request crosses several layers.
+4. **Connection** — how this file relates to the previous ones and what uses it next. A diagram of the request path helps when it crosses several layers.
 5. **Question** — when a concept is new or shaky, end with **one** question (see question-types.md), plus the skip option. Otherwise, end by asking if they want to continue.
 
 Then **stop and wait for the learner's reply.** Never answer your own question, and never cover the next file in the same message.
