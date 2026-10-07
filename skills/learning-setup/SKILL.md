@@ -41,7 +41,7 @@ Explain and ask for each, with the default in bold:
 
 - **Depth**: `quick` (only essentials) / **`standard`** / `deep` (trade-offs and alternatives)
 - **Hands-on**: `off` / **`light`** (rarely, 1–5 lines) / `moderate` (small exercises every few files)
-- **Diagrams**: **on** / off
+- **Diagrams**: **on** / off. If on, ask where they read the agent's replies: a **terminal** (`diagramStyle: text`, default) or somewhere that renders Mermaid, like an IDE chat panel (`diagramStyle: mermaid`).
 
 ## 5. Save and confirm
 

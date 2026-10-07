@@ -32,7 +32,7 @@ At most **one** think-first question per slice — pick the concept closest to `
 
 ## 1. Load the learner profile
 
-Read `~/.tacit/profile.md`. If it doesn't exist, use the defaults (`depth: standard`, `handsOn: light`, `diagrams: true`, every concept `unseen`) and continue — don't ask for setup now.
+Read `~/.tacit/profile.md`. If it doesn't exist, use the defaults (`depth: standard`, `handsOn: light`, `diagrams: true`, `diagramStyle: text`, every concept `unseen`) and continue — don't ask for setup now.
 
 ## 2. Understand the task
 
