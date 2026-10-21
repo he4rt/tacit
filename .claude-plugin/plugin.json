@@ -9,5 +9,12 @@
   "homepage": "https://github.com/he4rt/tacit",
   "repository": "https://github.com/he4rt/tacit",
   "license": "MIT",
-  "keywords": ["learning", "education", "code-review", "walkthrough", "architecture", "mentoring"]
+  "keywords": [
+    "learning",
+    "education",
+    "code-review",
+    "walkthrough",
+    "architecture",
+    "mentoring"
+  ]
 }
