@@ -14,6 +14,7 @@ version: 1
 depth: standard        # quick | standard | deep
 handsOn: light         # off | light | moderate
 diagrams: true
+diagramStyle: text     # text | mermaid
 languages: [typescript, sql]
 updated: 2026-10-06
 ---

@@ -37,9 +37,52 @@ Concepts not present in the catalog can still be taught — explain them from yo
 
 ## Diagrams
 
-- Use **Mermaid** fenced blocks (`flowchart`, `sequenceDiagram`, `erDiagram`, `classDiagram`). They render on GitHub, VS Code and most markdown viewers.
-- When the environment clearly cannot render Mermaid (plain terminal), also include a compact ASCII version.
-- Diagram what the learner needs right now: the overall flow at the start, a sequence diagram for a request crossing layers, an ER diagram for schema changes. Never more than one diagram per message.
+Most learners read Tacit in a terminal, where Mermaid shows up as raw source. So the default is a **text diagram**, which reads the same everywhere.
+
+Read `diagramStyle` from the learner profile (default `text`):
+
+- `text`: draw the diagram with characters inside a ` ```text ` fenced block.
+- `mermaid`: use Mermaid fenced blocks (`flowchart`, `sequenceDiagram`, `erDiagram`). Only for learners who read Tacit somewhere that renders it (IDE chat panels, markdown viewers). The size rules below still apply.
+
+### Fit the screen
+
+- **At most 60 columns wide** and about **8 boxes**. Terminals are often split or narrow, and wide lines get cut or wrapped.
+- **Flow top to bottom**, not left to right: vertical scrolls, horizontal gets cut.
+- **Short labels**: names and verbs only. Details go in the text below the diagram.
+- Box-drawing characters and arrows (`─ │ ┌ ┐ └ ┘ ├ ▶ ▼`) are fine. Avoid emoji and other wide characters — they break alignment.
+
+### Split big diagrams
+
+If the picture doesn't fit those limits, split it:
+
+1. An **overview** with the main parts as single boxes (e.g. `API`, `Services`, `Database`).
+2. One **detail diagram per part**, shown when the walkthrough reaches that part — not all at once.
+
+For a sequence with more than 4 participants, use a numbered list of steps instead of lanes.
+
+### Example
+
+```text
+Before
+  Internet (no login)
+    │ GET /api/backup-database
+    ▼
+  routes/api.php
+    │
+    ▼
+  BackupController::backup
+    ├─▶ mysqldump
+    └─▶ git push
+
+Now
+  GET /api/backup-database ──▶ 404 Not Found
+                                  ▲
+  BackupRouteRemovedTest ─────────┘ checks
+```
+
+### What to draw
+
+Diagram what the learner needs right now: the overall flow at the start, the path of a request crossing layers, the tables and their relationships for schema changes. Never more than one diagram per message.
 
 ## Hands-on
 
